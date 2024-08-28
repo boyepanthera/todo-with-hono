@@ -1,34 +1,34 @@
-# Honojs backend and rspack frontend
+# Todo with Honojs backend and rspack frontend
 
 ## For Backend
 
-cd /prod-hono-crud
-
 ```
-npm install
-npm run dev
-```
-
-```
-npm run deploy
+>> git clone https://github.com/boyepanthera/todo-with-hono.git
+>> cd /todo-with-hono/prod-hono-crud
+>> npm install
+>> npm run dev
 ```
 
-### To Create Database
+```
+bash$ npm run deploy
+```
 
-npx wrangler d1 create <dbname>
+To create database
+`>> npx wrangler d1 create <dbname>`
 
-### To create Database Migration file named init
+To create database migration file named init
+`>>npx wrangler d1 migrations create <dbname> init`
 
-npx wrangler d1 migrations create <dbname> init
+To create database migration named email_verification
+`>>npx wrangler d1 migrations create <dbname> email_verification`
 
-### To create Database Migration named email_verification
+To run update/migration in local database
+`>>npx wrangler d1 migrations apply <dbname> --local`
 
-npx wrangler d1 migrations create <dbname> email_verification
+To run update/migration in remote database
+`>>npx wrangler d1 migrations apply <dbname> --remote`
 
-### To run update/migration in local database
+## Live URLS
 
-npx wrangler d1 migrations apply <dbname> --local
-
-### To run update/migration in remote database
-
-npx wrangler d1 migrations apply <dbname> --remote
+1. [Frontend](https://honotodo.netlify.app/)
+2. [Backend](https://prod-hono-crud.sellaboye.workers.dev/)
