@@ -1,19 +1,15 @@
 import { Context } from "hono";
-
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/d1";
+import Todo from "../../models/todo.model";
 const getTodoById = async (c: Context) => {
-  const todoId = c.req.param("todoId");
-  console.log("todoId: ", todoId);
+  const todoId = Number(c.req.param("todoId")) as number;
 
   try {
-    const { success, results } = await c.env.DB.prepare(
-      "SELECT * FROM todos WHERE id = ?"
-    )
-      .bind(todoId)
-      .run();
+    const db = drizzle(c.env.DB);
+    const result = await db.select().from(Todo).where(eq(Todo.id, todoId));
 
-    // console.log("success", success, results);
-
-    if (!results.length) {
+    if (!result.length) {
       c.status(404);
       return c.json({
         success: false,
@@ -24,7 +20,7 @@ const getTodoById = async (c: Context) => {
 
     return c.json({
       success: true,
-      data: results[0],
+      data: result[0],
     });
   } catch (error) {
     return c.json({

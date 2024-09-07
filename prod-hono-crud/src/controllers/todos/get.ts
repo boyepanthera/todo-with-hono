@@ -1,14 +1,14 @@
 import { Context } from "hono";
+import { drizzle } from "drizzle-orm/d1";
+import Todo from "../../models/todo.model";
 
 const getTodos = async (c: Context) => {
   try {
-    const { results: todos } = await c.env.DB.prepare(
-      "SELECT * FROM todos ORDER BY created_at desc"
-    ).all();
-
+    const db = drizzle(c.env.DB);
+    const success = await db.select().from(Todo).all();
     return c.json({
       success: true,
-      data: todos,
+      data: success,
     });
   } catch (error) {
     console.error("ERR", error);

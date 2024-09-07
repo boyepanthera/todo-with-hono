@@ -1,20 +1,29 @@
 import { Context } from "hono";
+import { drizzle } from "drizzle-orm/d1";
+import Todo from "../../models/todo.model";
+import { eq } from "drizzle-orm";
 
 const updateTodos = async (c: Context) => {
   const { todoStatus } = await c.req.json();
-  const todoId = c.req.param("todoId");
+  console.log("todoStatus: " + todoStatus);
+  const todoId = Number(c.req.param("todoId")) as number;
 
   try {
-    const { success } = await c.env.DB.prepare(
-      "UPDATE todos SET is_completed = ? WHERE id = ?"
-    )
-      .bind(Number(todoStatus), todoId)
-      .run();
+    const db = drizzle(c.env.DB);
+    let success = await db
+      .update(Todo)
+      .set({ is_completed: todoStatus })
+      .where(eq(Todo.id, todoId))
+      .returning({ updated: Todo });
 
-    console.log("success", success);
+    if (!success.length) {
+      c.status(404);
+      return c.json({ message: "no todo with id" });
+    }
 
     return c.json({
       success: true,
+      message: "Todos updated successfully!!",
     });
   } catch (error) {
     console.log("error", error);

@@ -1,9 +1,9 @@
+import { drizzle } from "drizzle-orm/d1";
 import { Context } from "hono";
+import Todo from "../../models/todo.model";
 
 const createTodo = async (c: Context) => {
   const { todo } = await c.req.json();
-  console.log("todo: ", todo);
-
   if (!todo) {
     return c.json({
       success: false,
@@ -13,11 +13,10 @@ const createTodo = async (c: Context) => {
   }
 
   try {
-    const { success } = await c.env.DB.prepare(
-      "INSERT INTO todos (content) values (?)"
-    )
-      .bind(todo)
-      .run();
+    const db = drizzle(c.env.DB);
+    const success = await db.insert(Todo).values({
+      content: todo,
+    });
 
     console.log("success", success);
 

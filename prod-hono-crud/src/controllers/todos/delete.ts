@@ -1,12 +1,16 @@
 import { Context } from "hono";
+import { eq } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/d1";
+import Todo from "../../models/todo.model";
 
 const deleteTodo = async (c: Context) => {
-  const todoId = c.req.param("todoId");
-
+  const todoId = Number(c.req.param("todoId")) as number;
   try {
-    const { success } = await c.env.DB.prepare("DELETE FROM todos where id = ?")
-      .bind(todoId)
-      .run();
+    const db = drizzle(c.env.DB);
+    const success = await db
+      .delete(Todo)
+      .where(eq(Todo.id, todoId))
+      .returning();
 
     if (!success) {
       return c.json({
